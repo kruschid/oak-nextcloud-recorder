@@ -7,6 +7,7 @@ import signal
 import sys
 from camera import camera
 from recorder import recorder
+from uploader import uploader
 
 labelMap = ["background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow",
             "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
@@ -61,7 +62,8 @@ aio_scheduler = AsyncIOScheduler(loop=loop)
 
 subscription = merge(
     # camera.pipe(op.do_action(on_next=show_video,)),
-    recorder
+    recorder,
+    uploader,
 ).subscribe(
     on_completed=lambda: print('finito'),
     scheduler=aio_scheduler,

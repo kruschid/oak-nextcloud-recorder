@@ -20,12 +20,12 @@ def record(payload: tuple[cv2.Mat, list]):
     global is_recording
     is_recording = True
 
-    file_path = '{}.avi'.format(datetime.now())
+    file_path = '{}.mp4'.format(datetime.now())
     print('start recording: {} ...'.format(file_path))
 
     latest_detection_timestamp = time.time()
 
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(
         file_path,
         fourcc,
@@ -46,7 +46,7 @@ def record(payload: tuple[cv2.Mat, list]):
         out.write(payload[0])
 
     def finish_recording():
-        print('...finish recording')
+        print('...finish recording: {} ...'.format(file_path))
         global is_recording
         is_recording = False
         out.release()
@@ -69,5 +69,5 @@ def should_start_recording(payload: tuple[cv2.Mat, list]):
 recorder = camera.pipe(
     op.filter(should_start_recording),
     op.flat_map(record),
-    op.do_action(on_next=lambda path: print(path))
+    op.share(),
 )
