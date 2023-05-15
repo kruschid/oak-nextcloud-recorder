@@ -1,7 +1,9 @@
+import requests
 from recorder import recorder
 from config import config
 from webdav3.client import Client
 from reactivex import Observer, operators as op, create, timer
+import os
 
 options = {
     'webdav_hostname': config['WEBDAV_HOSTNAME'],
@@ -44,6 +46,24 @@ def upload_recording(path):
     )
 
 
+def remove_temprary_file(path: str):
+    if os.path.isfile(path):
+        os.remove(path)
+
+
+def notify(path: str):
+    requests.get(
+        'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage?chat_id={TELEGRAM_CHAT_ID}&text=oak-nextcloud-recorder%20new%20recording:%20{PATH}'.format(
+            TELEGRAM_TOKEN=config['TELEGRAM_TOKEN'],
+            TELEGRAM_CHAT_ID=config['TELEGRAM_CHAT_ID'],
+            PATH=path,
+        ),
+        timeout=3
+    )
+
+
 uploader = recorder.pipe(
-    op.flat_map(upload_recording)
+    op.flat_map(upload_recording),
+    op.do_action(on_next=remove_temprary_file),
+    op.do_action(on_next=notify),
 )
