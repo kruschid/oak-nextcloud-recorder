@@ -60,18 +60,26 @@ def show_video(payload: tuple[cv2.Mat, any]):
 loop = asyncio.new_event_loop()
 aio_scheduler = AsyncIOScheduler(loop=loop)
 
+
+def on_error(err):
+    print(err)
+    loop.stop()
+    sys.exit(1)
+
+
 subscription = merge(
     # camera.pipe(op.do_action(on_next=show_video,)),
     recorder,
     uploader,
 ).subscribe(
     on_completed=lambda: print('finito'),
+    on_error=on_error,
     scheduler=aio_scheduler,
 )
 
 
 def signal_handler(sig, frame):
-    print('You pressed Ctrl+C!')
+    print('exiting...')
     subscription.dispose()
     loop.stop()
     sys.exit(0)
