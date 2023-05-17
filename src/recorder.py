@@ -38,7 +38,7 @@ def record(payload: tuple[cv2.Mat, list]):
         if has_detected_person(payload):
             latest_detection_timestamp = time.time()
 
-        print(latest_detection_timestamp)
+        # print(latest_detection_timestamp)
 
         return time.time() - latest_detection_timestamp < 5
 
