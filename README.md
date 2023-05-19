@@ -19,10 +19,11 @@ docker build -t oak-recorder .
 ## How to run
 
 ```sh
-docker run --rm \
-  --restart unless-stopped
+docker run -d \
+  --restart unless-stopped \
   --privileged \
   -v /dev/bus/usb:/dev/bus/usb \
   --device-cgroup-rule='c 189:* rmw' \
+  --name oak-recorder \
   oak-recorder
 ```
